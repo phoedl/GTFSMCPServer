@@ -1,0 +1,4 @@
+route_id,agency_id,route_short_name,route_long_name,route_desc,route_type,route_url,route_color,route_text_color,route_sort_order
+ROUTE_01,SAMPLE_AGENCY,R1,Red Line,Main line connecting central areas,1,,FF0000,FFFFFF,1
+ROUTE_02,SAMPLE_AGENCY,B2,Blue Line,Express line to airport,1,,0000FF,FFFFFF,2
+ROUTE_03,SAMPLE_AGENCY,G3,Green Line,Local service line,1,,00FF00,000000,3

@@ -1,0 +1,14 @@
+name: gtfs-mcp-server
+metadata:
+  template: containerapp@0.0.1-beta
+infra:
+  provider: bicep
+  path: infra
+services:
+  gtfs-mcp-server:
+    project: GTFSMCPServer
+    host: containerapp
+    language: dotnet
+    docker:
+      path: Dockerfile
+      context: ./

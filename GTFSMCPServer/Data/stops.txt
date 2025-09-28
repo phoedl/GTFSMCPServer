@@ -1,0 +1,6 @@
+stop_id,stop_name,stop_desc,stop_lat,stop_lon,zone_id,stop_url,location_type,parent_station,stop_code,stop_timezone,wheelchair_boarding
+STOP_001,Central Station,Main railway station in the city center,40.7589,-73.9851,ZONE_A,,0,,,America/New_York,1
+STOP_002,North Terminal,Northern terminal station,40.7831,-73.9712,ZONE_B,,0,,,America/New_York,1
+STOP_003,East Junction,Junction station on the east side,40.7505,-73.9934,ZONE_A,,0,,,America/New_York,1
+STOP_004,West End,Western terminus of the line,40.7614,-74.0055,ZONE_C,,0,,,America/New_York,1
+STOP_005,Airport Hub,Airport connection hub,40.6892,-74.1745,ZONE_D,,0,,,America/New_York,1
