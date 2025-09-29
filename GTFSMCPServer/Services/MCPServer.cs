@@ -367,10 +367,6 @@ public class MCPServer
         foreach (var stop in stops)
         {
             result.AppendLine($"• {stop.StopName} (ID: {stop.StopId})");
-            if (!string.IsNullOrEmpty(stop.StopDescription))
-            {
-                result.AppendLine($"  {stop.StopDescription}");
-            }
         }
 
         if (stops.Count == 0)
@@ -499,10 +495,7 @@ public class MCPServer
             {
                 result.AppendLine($"  {route.RouteLongName}");
             }
-            if (!string.IsNullOrEmpty(route.RouteDescription))
-            {
-                result.AppendLine($"  {route.RouteDescription}");
-            }
+
         }
 
         return Task.FromResult(new MCPToolResult

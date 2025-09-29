@@ -19,37 +19,16 @@ param gtfsMcpServerImage string = 'mcr.microsoft.com/azuredocs/containerapps-hel
 var resourceToken = uniqueString(subscription().id, resourceGroup().id, location, environmentName)
 var resourcePrefix = 'gtfs'
 
-// Container Apps Environment
-resource containerAppsEnvironment 'Microsoft.App/managedEnvironments@2023-05-01' = {
-  name: 'cae-${resourcePrefix}-${resourceToken}'
-  location: location
-  tags: {
-    'azd-env-name': environmentName
-  }
-  properties: {
-    appLogsConfiguration: {
-      destination: 'log-analytics'
-      logAnalyticsConfiguration: {
-        customerId: logAnalytics.properties.customerId
-        sharedKey: logAnalytics.listKeys().primarySharedKey
-      }
-    }
-  }
+// Reference existing Container Apps Environment
+resource containerAppsEnvironment 'Microsoft.App/managedEnvironments@2023-05-01' existing = {
+  name: 'cae-gtfs-36nzivsnrncbu'
+  scope: resourceGroup('OeBBHackaton')
 }
 
-// Log Analytics Workspace
-resource logAnalytics 'Microsoft.OperationalInsights/workspaces@2023-09-01' = {
-  name: 'log-${resourcePrefix}-${resourceToken}'
-  location: location
-  tags: {
-    'azd-env-name': environmentName
-  }
-  properties: {
-    sku: {
-      name: 'PerGB2018'
-    }
-    retentionInDays: 30
-  }
+// Reference existing Log Analytics Workspace
+resource logAnalytics 'Microsoft.OperationalInsights/workspaces@2023-09-01' existing = {
+  name: 'log-gtfs-36nzivsnrncbu'
+  scope: resourceGroup('OeBBHackaton')
 }
 
 // Application Insights
@@ -103,10 +82,10 @@ resource acrPullRoleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-
 
 // GTFS MCP Server Container App
 resource gtfsMcpServer 'Microsoft.App/containerApps@2023-05-01' = {
-  name: 'ca-${resourcePrefix}-${resourceToken}'
+  name: 'ca-${resourcePrefix}-prod-${resourceToken}'
   location: location
   tags: {
-    'azd-service-name': 'gtfs-mcp-server'
+    'azd-service-name': 'gtfs-mcp-server-prod'
     'azd-env-name': environmentName
   }
   identity: {

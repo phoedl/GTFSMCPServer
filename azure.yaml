@@ -5,7 +5,7 @@ infra:
   provider: bicep
   path: infra
 services:
-  gtfs-mcp-server:
+  gtfs-mcp-server-prod:
     project: GTFSMCPServer
     host: containerapp
     language: dotnet

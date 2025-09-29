@@ -34,9 +34,6 @@ public class StopTime
     [Name("shape_dist_traveled")]
     public double? ShapeDistanceTraveled { get; set; }
 
-    [Name("timepoint")]
-    public int Timepoint { get; set; } = 1;
-
     // Helper property to get arrival time as TimeSpan
     public TimeSpan ArrivalTimeSpan => ParseGTFSTime(ArrivalTime);
 

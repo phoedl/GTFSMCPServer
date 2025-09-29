@@ -24,10 +24,4 @@ public class Agency
 
     [Name("agency_phone")]
     public string? AgencyPhone { get; set; }
-
-    [Name("agency_fare_url")]
-    public string? AgencyFareUrl { get; set; }
-
-    [Name("agency_email")]
-    public string? AgencyEmail { get; set; }
 }

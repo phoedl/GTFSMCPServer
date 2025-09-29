@@ -51,3 +51,4 @@ E:\Source\MCP\Test\GTFSMCPServer\obj\Debug\net8.0\refint\GTFSMCPServer.dll
 E:\Source\MCP\Test\GTFSMCPServer\obj\Debug\net8.0\GTFSMCPServer.pdb
 E:\Source\MCP\Test\GTFSMCPServer\obj\Debug\net8.0\GTFSMCPServer.genruntimeconfig.cache
 E:\Source\MCP\Test\GTFSMCPServer\obj\Debug\net8.0\ref\GTFSMCPServer.dll
+E:\Source\MCP\Test\GTFSMCPServer\obj\Debug\net8.0\GTFSMCPServer.sourcelink.json

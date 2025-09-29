@@ -19,21 +19,6 @@ public class Route
     [Name("route_long_name")]
     public string? RouteLongName { get; set; }
 
-    [Name("route_desc")]
-    public string? RouteDescription { get; set; }
-
     [Name("route_type")]
     public int RouteType { get; set; }
-
-    [Name("route_url")]
-    public string? RouteUrl { get; set; }
-
-    [Name("route_color")]
-    public string? RouteColor { get; set; }
-
-    [Name("route_text_color")]
-    public string? RouteTextColor { get; set; }
-
-    [Name("route_sort_order")]
-    public int? RouteSortOrder { get; set; }
 }

@@ -30,10 +30,4 @@ public class Trip
 
     [Name("shape_id")]
     public string? ShapeId { get; set; }
-
-    [Name("wheelchair_accessible")]
-    public int WheelchairAccessible { get; set; } = 0;
-
-    [Name("bikes_allowed")]
-    public int BikesAllowed { get; set; } = 0;
 }
