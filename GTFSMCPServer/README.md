@@ -140,7 +140,7 @@ List all available routes in the Austrian railway network.
 
 #### Find connections between Wien Mitte and Vienna Airport:
 ```bash
-curl -X POST "https://ca-gtfs-prod-uqobwqigygb2k.calmcliff-1fda861a.westeurope.azurecontainerapps.io/mcp" \
+curl -X POST "https://[deployment url]/mcp" \
   -H "Content-Type: application/json" \
   -d '{
     "jsonrpc": "2.0",
@@ -161,7 +161,7 @@ curl -X POST "https://ca-gtfs-prod-uqobwqigygb2k.calmcliff-1fda861a.westeurope.a
 
 #### Search for stations:
 ```bash
-curl -X POST "https://ca-gtfs-prod-uqobwqigygb2k.calmcliff-1fda861a.westeurope.azurecontainerapps.io/mcp" \
+curl -X POST "https://[deployment url]/mcp" \
   -H "Content-Type: application/json" \
   -d '{
     "jsonrpc": "2.0",
