@@ -218,6 +218,9 @@ public class MCPServer
                 case "list_routes":
                     return await ListRoutesAsync(toolCall.Arguments);
                 
+                case "find_connections_by_name":
+                    return await FindConnectionsByNameAsync(toolCall.Arguments);
+                
                 default:
                     return new MCPToolResult
                     {
@@ -321,6 +324,183 @@ public class MCPServer
         if (connections.Count == 0)
         {
             result.AppendLine("No connections found for the specified criteria.");
+        }
+
+        return new MCPToolResult
+        {
+            Content = new List<MCPContent>
+            {
+                new MCPContent
+                {
+                    Type = "text",
+                    Text = result.ToString()
+                }
+            }
+        };
+    }
+
+    /// <summary>
+    /// Find train connections using station names instead of IDs
+    /// </summary>
+    private async Task<MCPToolResult> FindConnectionsByNameAsync(Dictionary<string, object>? arguments)
+    {
+        if (arguments == null || 
+            !arguments.TryGetValue("from_station_name", out var fromStationObj) ||
+            !arguments.TryGetValue("to_station_name", out var toStationObj) ||
+            !arguments.TryGetValue("date", out var dateObj))
+        {
+            return new MCPToolResult
+            {
+                Content = new List<MCPContent>
+                {
+                    new MCPContent
+                    {
+                        Type = "text",
+                        Text = "Missing required parameters: from_station_name, to_station_name, date"
+                    }
+                },
+                IsError = true
+            };
+        }
+
+        var fromStationName = fromStationObj.ToString() ?? "";
+        var toStationName = toStationObj.ToString() ?? "";
+        
+        if (!DateTime.TryParse(dateObj.ToString(), out var date))
+        {
+            return new MCPToolResult
+            {
+                Content = new List<MCPContent>
+                {
+                    new MCPContent
+                    {
+                        Type = "text",
+                        Text = "Invalid date format. Use YYYY-MM-DD"
+                    }
+                },
+                IsError = true
+            };
+        }
+
+        TimeSpan? departureTime = null;
+        if (arguments.TryGetValue("departure_time", out var depTimeObj) &&
+            TimeSpan.TryParse(depTimeObj.ToString(), out var depTime))
+        {
+            departureTime = depTime;
+        }
+
+        int limit = 50; // Default limit
+        if (arguments.TryGetValue("limit", out var limitObj) &&
+            int.TryParse(limitObj.ToString(), out var limitValue))
+        {
+            limit = Math.Max(1, Math.Min(limitValue, 200)); // Clamp between 1 and 200
+        }
+
+        // Find all matching stations for origin and destination
+        var fromStations = _gtfsService.FindStopsByName(fromStationName);
+        var toStations = _gtfsService.FindStopsByName(toStationName);
+
+        if (fromStations.Count == 0)
+        {
+            return new MCPToolResult
+            {
+                Content = new List<MCPContent>
+                {
+                    new MCPContent
+                    {
+                        Type = "text",
+                        Text = $"No stations found matching '{fromStationName}'"
+                    }
+                },
+                IsError = true
+            };
+        }
+
+        if (toStations.Count == 0)
+        {
+            return new MCPToolResult
+            {
+                Content = new List<MCPContent>
+                {
+                    new MCPContent
+                    {
+                        Type = "text",
+                        Text = $"No stations found matching '{toStationName}'"
+                    }
+                },
+                IsError = true
+            };
+        }
+
+        // Find connections between all combinations of matching stations
+        var allConnections = new List<dynamic>();
+        var stationCombinations = new List<(string FromId, string FromName, string ToId, string ToName)>();
+
+        foreach (var fromStation in fromStations)
+        {
+            foreach (var toStation in toStations)
+            {
+                if (fromStation.StopId != toStation.StopId) // Avoid same station
+                {
+                    stationCombinations.Add((fromStation.StopId, fromStation.StopName, 
+                                           toStation.StopId, toStation.StopName));
+                    
+                    var connections = await _gtfsService.FindConnectionsAsync(
+                        fromStation.StopId, toStation.StopId, date, departureTime);
+                    
+                    foreach (var connection in connections)
+                    {
+                        allConnections.Add(new
+                        {
+                            Connection = connection,
+                            FromStationName = fromStation.StopName,
+                            ToStationName = toStation.StopName,
+                            FromStationId = fromStation.StopId,
+                            ToStationId = toStation.StopId
+                        });
+                    }
+                }
+            }
+        }
+
+        // Sort connections by departure time and take the limit
+        var sortedConnections = allConnections
+            .OrderBy(c => c.Connection.DepartureTime)
+            .Take(limit)
+            .ToList();
+
+        var result = new StringBuilder();
+        result.AppendLine($"Found {allConnections.Count} total connections ({sortedConnections.Count} shown) between stations matching '{fromStationName}' and '{toStationName}' on {date:yyyy-MM-dd}:");
+        result.AppendLine();
+
+        if (fromStations.Count > 1 || toStations.Count > 1)
+        {
+            result.AppendLine("Station combinations checked:");
+            result.AppendLine($"• From: {string.Join(", ", fromStations.Select(s => s.StopName))} ({fromStations.Count} stations)");
+            result.AppendLine($"• To: {string.Join(", ", toStations.Select(s => s.StopName))} ({toStations.Count} stations)");
+            result.AppendLine();
+        }
+
+        foreach (var item in sortedConnections)
+        {
+            var connection = item.Connection;
+            result.AppendLine($"Route {connection.RouteShortName}: {connection.DepartureTime:hh\\:mm} → {connection.ArrivalTime:hh\\:mm} (Duration: {connection.Duration:hh\\:mm})");
+            result.AppendLine($"  From: {item.FromStationName} (ID: {item.FromStationId})");
+            result.AppendLine($"  To: {item.ToStationName} (ID: {item.ToStationId})");
+            if (!string.IsNullOrEmpty(connection.TripHeadsign))
+            {
+                result.AppendLine($"  Headsign: {connection.TripHeadsign}");
+            }
+            result.AppendLine();
+        }
+
+        if (allConnections.Count == 0)
+        {
+            result.AppendLine("No connections found between any of the matching stations.");
+        }
+        else if (allConnections.Count > limit)
+        {
+            result.AppendLine($"Note: Showing first {limit} connections out of {allConnections.Count} total. Use 'limit' parameter to see more.");
         }
 
         return new MCPToolResult
@@ -574,7 +754,7 @@ public class MCPServer
             ["get_departures"] = new MCPTool
             {
                 Name = "get_departures",
-                Description = "Get departures from a specific stop on a given date",
+                Description = "Get departures from a specific stop id on a given date",
                 InputSchema = new MCPToolInputSchema
                 {
                     Properties = new Dictionary<string, MCPToolProperty>
@@ -582,7 +762,7 @@ public class MCPServer
                         ["stop_id"] = new MCPToolProperty
                         {
                             Type = "string",
-                            Description = "ID of the stop"
+                            Description = "Stop ID of the stop"
                         },
                         ["date"] = new MCPToolProperty
                         {
@@ -609,6 +789,46 @@ public class MCPServer
                 {
                     Properties = new Dictionary<string, MCPToolProperty>(),
                     Required = new List<string>()
+                }
+            },
+            
+            ["find_connections_by_name"] = new MCPTool
+            {
+                Name = "find_connections_by_name",
+                Description = "Find train connections between stations using station names (searches all matching stations)",
+                InputSchema = new MCPToolInputSchema
+                {
+                    Properties = new Dictionary<string, MCPToolProperty>
+                    {
+                        ["from_station_name"] = new MCPToolProperty
+                        {
+                            Type = "string",
+                            Description = "Name (or partial name) of the departure station"
+                        },
+                        ["to_station_name"] = new MCPToolProperty
+                        {
+                            Type = "string",
+                            Description = "Name (or partial name) of the arrival station"
+                        },
+                        ["date"] = new MCPToolProperty
+                        {
+                            Type = "string",
+                            Description = "Date to search for connections (YYYY-MM-DD)",
+                            Format = "date"
+                        },
+                        ["departure_time"] = new MCPToolProperty
+                        {
+                            Type = "string",
+                            Description = "Optional earliest departure time (HH:MM)",
+                            Format = "time"
+                        },
+                        ["limit"] = new MCPToolProperty
+                        {
+                            Type = "integer",
+                            Description = "Optional maximum number of connections to return (default: 50)"
+                        }
+                    },
+                    Required = new List<string> { "from_station_name", "to_station_name", "date" }
                 }
             }
         };
