@@ -15,7 +15,7 @@ A Model Context Protocol (MCP) server implementation in C# that provides functio
 ## 🚀 Live Demo
 
 The server is deployed and ready to use:
-- **Production URL**: https://ca-gtfs-prod-uqobwqigygb2k.calmcliff-1fda861a.westeurope.azurecontainerapps.io/mcp
+- **Production URL**: https://[deployment url]/mcp
 - **Test with Postman/curl**: Use the `/mcp` endpoint for HTTP requests
 - **Austrian Railway Data**: Real ÖBB schedules with 7,141 stops, 246 routes, 9,615 trips
 

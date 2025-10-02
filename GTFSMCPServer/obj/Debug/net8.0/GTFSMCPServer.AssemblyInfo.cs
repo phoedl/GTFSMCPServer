@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("GTFSMCPServer")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+3fd092268a30eec736ef74eb8d5346f53753cce7")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+41343922c568a9d3ce7b33705abbc44b2d3c38f7")]
 [assembly: System.Reflection.AssemblyProductAttribute("GTFSMCPServer")]
 [assembly: System.Reflection.AssemblyTitleAttribute("GTFSMCPServer")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
