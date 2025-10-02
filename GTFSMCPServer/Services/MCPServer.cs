@@ -701,7 +701,7 @@ public class MCPServer
             ["find_train_connections"] = new MCPTool
             {
                 Name = "find_train_connections",
-                Description = "Find train connections between two stops on a specific date",
+                Description = "Find train connections between two stops on a specific date. Only use it if the excact stop id of origin and depature and the plattform are known",
                 InputSchema = new MCPToolInputSchema
                 {
                     Properties = new Dictionary<string, MCPToolProperty>
